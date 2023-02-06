@@ -1,8 +1,5 @@
 import requests
 import base64
-from urllib.parse import parse_qs
-from urllib.parse import urlparse
-from bs4 import BeautifulSoup
 import js2py
 import re
 
