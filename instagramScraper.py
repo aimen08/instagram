@@ -1,7 +1,7 @@
 import requests
 import base64
 import js2py
-import re
+import json
 
 
 
@@ -11,9 +11,6 @@ def b64decode(str):
     str += "=" * ((4 - len(str) % 4) % 4)
     return base64.b64decode(str)
 
-headers = {
-    'user-agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:92.0) Gecko/20100101 Firefox/92.0',
-}
 
 instagramDomains = (
     'https://www.instagram.com',
@@ -27,35 +24,19 @@ def getVideo(url):
 
     if url.lower().startswith(instagramDomains):
         url = url.split('?')[0]  
-        data = {
-            "url":url,
-            "action":"post",
-            "lang":"",
-        }     
+
         try:
             
             headers= {
-                'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:92.0) Gecko/20100101 Firefox/92.0',
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-                'Accept-Language': 'en-US,en;q=0.5',
-                'Accept-Encoding': 'gzip, deflate',
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Content-Length': '96',
-                'Origin': 'https://snapinsta.app',
-                'Referer': 'https://snapinsta.app',
-                'Upgrade-Insecure-Requests': '1',
-                'Sec-Fetch-Dest': 'document',
-                'Sec-Fetch-Mode': 'navigate',
-                'Sec-Fetch-Site': 'same-origin',
-                'Sec-Fetch-User': '?1',
-                # "Cookie": f"__cf_bm={cookies['__cf_bm']}; _cfuvid={cookies['_cfuvid']}",               
+                'url':url,
+                'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
+                'origin': 'https://instavideosave.net',
+                'accept': '*/*'
             }
-            
-            response = requests.post('https://snapinsta.app/action.php', data=data, headers=headers, allow_redirects=False)
-            js =  response.content.decode("utf-8").replace("eval", "")  
-            s = js2py.eval_js(js)     
-            link , _ = re.findall(r'href=\\"(([^"])+)', s)[0]
 
+            response = requests.get('https://api.instavideosave.com/allinone', headers=headers, allow_redirects=True)
+
+            link = json.loads(response.content.decode('unicode_escape'))["video"][0]["video"]
             return link
 
         except Exception as e:
